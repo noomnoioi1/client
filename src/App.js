@@ -1,23 +1,73 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+
+import Login from "./pages/auth/login/Login";
+import Home from "./pages/user/Home";
+import Mawsd from "./pages/user/Mawsd";
+
+// V.6
+import { Routes, Route } from "react-router-dom";
+
+// functions
+import { currentUser } from "./functions/auth";
+// redux
+import { useDispatch } from "react-redux";
+
+// Routes
+import UserRoute from "./routes/UserRoute";
+
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function App() {
+
+  const dispatch = useDispatch();
+  const idtoken = localStorage.token;
+  if (idtoken) {
+    currentUser(idtoken)
+      .then((res) => {
+        //code
+        console.log(res.data);
+        dispatch({
+          type: "LOGIN",
+          payload: {
+            token: idtoken,
+            username: res.data.username,
+            role: res.data.role,
+          },
+        });
+      })
+      .catch((err) => {
+        //err
+        console.log(err);
+      });
+  }
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {/* <Register/> */}
+      <Routes>
+        <Route path="/" element={<Login />} />
+
+        <Route
+          path="/user/index"
+          element={
+            <UserRoute>
+              <Home />
+            </UserRoute>
+          }
+        />
+
+       <Route
+          path="/user/mawsd"
+          element={
+            <UserRoute>
+              <Mawsd />
+            </UserRoute>
+          }
+        />
+      </Routes>
     </div>
   );
 }
